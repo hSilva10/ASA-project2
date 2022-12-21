@@ -1,5 +1,7 @@
 CFLAGS = -std=c++11 -O3 -Wall -lm
 
+TEST = tests/t_input_1.txt,tests/t_input_2.txt
+
 project_base: project_base.cpp
 	g++ $(CFLAGS) -cpp project_base.cpp -o project_base
 
@@ -9,8 +11,16 @@ project_alt: project_alt.cpp
 clean:
 	rm -f *.o project_base project_alt
 
+exec:
+	./project_base
+
+run: clean project_base exec
+
 run1:
 	./project_base < tests/t_input_1.txt
 
 run2:
-	./project_base < tests/t_input_2.txt	
+	./project_base < tests/t_input_2.txt
+
+hyperfine:
+	hyperfine --export-markdown data.md --runs 10 --warmup 2 --parameter-list TEST $(TEST) './project_base < {TEST}'
