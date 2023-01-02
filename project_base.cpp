@@ -3,33 +3,44 @@
 #include <algorithm>
 
 using namespace std;
-
-typedef struct {
-    int value;
-    int a, b;
-}Edge;
+class Edge {
+public:
+    int value, a , b;
+    Edge(){
+        this->value = 0;
+        this->a = 0;
+        this->b = 0;
+    }
+    Edge(int value, int a, int b){
+        this->value = value;
+        this->a = a-1;
+        this->b = b-1;
+    }
+};
 
 typedef vector<Edge> Edges;
 
-struct Node {
-    int parent;
-    int rank;
-};
 
 class DisjointSetForest {
+    int *rank = nullptr, *parent = nullptr, n = 0;
 public:
-    DisjointSetForest(int num_vertices) : nodes_(num_vertices) {
-        for (int i = 0; i < num_vertices; i++) {
-            nodes_[i].parent = i;
-            nodes_[i].rank = 0;
-        }
+    DisjointSetForest(int num_vertices) {
+        rank = new int[num_vertices];
+        parent = new int[num_vertices];
+        this->n = num_vertices;
+        makeSet();
+    }
+
+    void makeSet(){
+        for(int i = 0; i < n; i++)
+            parent[i] = i;
     }
 
     int find(int x) {
-        if (nodes_[x].parent != x) {
-            nodes_[x].parent = find(nodes_[x].parent);
+        if (parent[x] != x) {
+            parent[x] = find(parent[x]);
         }
-        return nodes_[x].parent;
+        return parent[x];
     }
 
     void union_sets(int x, int y) {
@@ -37,18 +48,18 @@ public:
         int root_y = find(y);
         if (root_x == root_y) return;
 
-        if (nodes_[root_x].rank < nodes_[root_y].rank) {
-            nodes_[root_x].parent = root_y;
-        } else if (nodes_[root_x].rank > nodes_[root_y].rank) {
-            nodes_[root_y].parent = root_x;
-        } else {
-            nodes_[root_y].parent = root_x;
-            nodes_[root_x].rank++;
-        }
+        link(root_x, root_y);
     }
 
-private:
-    vector<Node> nodes_;
+    void link(int x, int y){
+        if(rank[x] > rank[y])
+            parent[y] = x;
+        else {
+            parent[x] = y;
+            if (rank[x] == rank[y])
+                rank[y]++;
+        }
+    }
 };
 
 void kruskal(Edges& edges, int num_vertices) {
@@ -61,8 +72,10 @@ void kruskal(Edges& edges, int num_vertices) {
     // Initialize the disjoint-set forest data structure
     DisjointSetForest parents(num_vertices);
 
+    int num_edges = 0;
+
     int max_weight = 0;
-    for (const auto& edge : edges) {
+    for (Edge edge : edges) {
         // Find the root of the two vertices connected by this edge
         int root_a = parents.find(edge.a);
         int root_b = parents.find(edge.b);
@@ -71,23 +84,30 @@ void kruskal(Edges& edges, int num_vertices) {
         // to the maximum weight spanning tree
         if (root_a != root_b) {
             parents.union_sets(root_a, root_b);
+            num_edges++;
             max_weight += edge.value;
         }
+        if(num_edges == num_vertices - 1)
+            break;
     }
 
-    cout << max_weight << endl;
+    printf("%d\n", max_weight);
 }
 
 int main() {
-    int nodes_num, edges_num;
-    cin >> nodes_num >> edges_num;
+    int nodes_num = 0, edges_num = 0;
+    scanf("%d %d", &nodes_num, &edges_num);
 
+    if(nodes_num == 0 || edges_num == 0) {
+        printf("%d\n", 0);
+        return 0;
+    }
     // Read in the edges
     Edges edges;
     for (int i = 0; i < edges_num; i++) {
         int a, b, value;
-        cin >> a >> b >> value;
-        edges.push_back({value, a, b});
+        scanf("%d %d %d", &a, &b, &value);
+        edges.push_back(Edge(value,a,b));
     }
 
     kruskal(edges, nodes_num);

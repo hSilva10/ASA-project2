@@ -66,13 +66,15 @@ void prim(Edges& edges, int num_vertices) {
 
 int main() {
     int nodes_num, edges_num;
-    cin >> nodes_num >> edges_num;
+    if(scanf("%d", &nodes_num) == -1) return 1;
+    if(scanf("%d", &edges_num) == -1) return 1;
 
+    if(edges_num == 0 || nodes_num == 0){cout << 0 << endl; return 0;}
     // Read in the edges
     Edges edges;
     for (int i = 0; i < edges_num; i++) {
         int a, b, value;
-        cin >> a >> b >> value;
+        if(scanf("%d %d %d", &a, &b, &value) == -1) return 1;
         edges.push_back({value, a, b});
     }
 
