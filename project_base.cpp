@@ -31,11 +31,19 @@ public:
         makeSet();
     }
 
+    /* Time complexity
+     * -> O(V)
+     * */
     void makeSet(){
         for(int i = 0; i < n; i++)
             parent[i] = i;
     }
 
+    /* Time complexity:
+     *  best case: O(1)
+     *  worst case: O(V)
+     *  average case: O(alpha(V)) - inverse Ackermann function which means the complexity of find operation is practically constant and close to O(1)
+     * */
     int find(int x) {
         if (parent[x] != x) {
             parent[x] = find(parent[x]);
@@ -43,6 +51,11 @@ public:
         return parent[x];
     }
 
+    /* Time complexity:
+     *  best case: O(1)
+     *  worst case: O(V)
+     *  average case: O(alpha(V))
+     * */
     void union_sets(int x, int y) {
         int root_x = find(x);
         int root_y = find(y);
@@ -50,7 +63,9 @@ public:
 
         link(root_x, root_y);
     }
-
+    /* Time complexity:
+     *  -> O(1)
+     * */
     void link(int x, int y){
         if(rank[x] > rank[y])
             parent[y] = x;
@@ -62,9 +77,15 @@ public:
     }
 };
 
+/* Time complexity:
+ * O(E*logE) + O(E*alpha(V)) => O(E*log(E))
+ * */
 void kruskal(Edges& edges, int num_vertices) {
-    // Sort the edges by weight in non-decreasing order
-    sort(edges.begin(), edges.end(), [](const Edge& a, const Edge& b) {
+    /* Sort the edges by weight in non-decreasing order
+    *  Time complexity:
+     *  -> O(E*log(E))
+     */
+     sort(edges.begin(), edges.end(), [](const Edge& a, const Edge& b) {
         return a.value > b.value;
     });
 
@@ -75,6 +96,10 @@ void kruskal(Edges& edges, int num_vertices) {
     int num_edges = 0;
 
     int max_weight = 0;
+    /* Time complexity:
+     *  average -> O(E*alpha(V)) - E operations of union_sets
+     *  note: (|E| >= |V| - 1)
+     * */
     for (Edge edge : edges) {
         // Find the root of the two vertices connected by this edge
         int root_a = parents.find(edge.a);
@@ -94,6 +119,9 @@ void kruskal(Edges& edges, int num_vertices) {
     printf("%d\n", max_weight);
 }
 
+/* Overall time complexity:
+ * -> O(E) + O(E*log(E)) => O(E*log(E))
+ * */
 int main() {
     int nodes_num = 0, edges_num = 0;
     scanf("%d %d", &nodes_num, &edges_num);
@@ -102,14 +130,19 @@ int main() {
         printf("%d\n", 0);
         return 0;
     }
-    // Read in the edges
+    /* Read in the edges
+     * Time complexity:
+     *  -> O(E)
+     */
     Edges edges;
     for (int i = 0; i < edges_num; i++) {
         int a, b, value;
         scanf("%d %d %d", &a, &b, &value);
         edges.push_back(Edge(value,a,b));
     }
-
+    /* Time complexity:
+     *  -> O(E*log(E))
+     * */
     kruskal(edges, nodes_num);
     return 0;
 }
